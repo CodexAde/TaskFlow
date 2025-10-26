@@ -26,7 +26,12 @@ const taskSchema = new mongoose.Schema({
     tone: {
         type: String,
         // enum: ["Happy", "Sad", "Angry", "Motivated", "Neutral"],
-        default: "Neutral"
+        default: "Angry"
+    },
+    language: {
+        type: String,
+        // enum: ["English", "Spanish", "French", "German", "Chinese"],
+        default: "English"
     }
 }, { timestamps: true })
 

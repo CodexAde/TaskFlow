@@ -11,8 +11,7 @@ async function authenticatingToken(req, res, next) {
 
         const token = gettingToken.split(" ")[1];
         // console.log("Extracted Token:", token || "No token found after Bearer");
-        
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         // console.log("Authenticated user ID:", req.user._id   || "No user ID found in token");

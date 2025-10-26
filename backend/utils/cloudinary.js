@@ -1,4 +1,4 @@
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import dotenv from 'dotenv'
 
@@ -11,32 +11,23 @@ cloudinary.config({
 });
 
 
-const uploadOnCloudinary = async (localFilePath)=>{
+const uploadOnCloudinary = async (localFilePath) => {
+  try {
+    if (!localFilePath) return console.log("unable to find the local path");
     try {
-        if (!localFilePath) return console.log("unable to find the local path");
-        try {
-            const response = await cloudinary.uploader.upload(localFilePath,{resource_type: "auto"})
-            
-
-    fs.unlinkSync(localFilePath);
-
-    return {
-      url: response.secure_url,
-      public_id: response.public_id,
-    };
-
-
-
-        } catch (error) {
-           console.log("there is an error while uploadng to cloudinary ", error);
-            
-        }
-
-        
+      const response = await cloudinary.uploader.upload(localFilePath, { resource_type: "auto" })
+      fs.unlinkSync(localFilePath);
+      return {
+        url: response.secure_url,
+        public_id: response.public_id,
+      };
     } catch (error) {
-        fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
+      console.log("there is an error while uploadng to cloudinary ", error);
     }
-    
-} 
+  } catch (error) {
+    fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
+  }
+
+}
 
 export { uploadOnCloudinary };

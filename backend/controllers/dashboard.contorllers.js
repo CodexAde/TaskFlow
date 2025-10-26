@@ -1,5 +1,7 @@
 import { User } from '../models/user.models.js'
 import Task from "../models/task.models.js";
+import mongoose from 'mongoose';
+import { getAIResponse } from '../utils/gemini.js';
 
 async function getAllUsers(req, res) {
     try {
@@ -17,41 +19,56 @@ async function getAllUsers(req, res) {
 }
 
 async function getSpecificTask(req, res) {
-        const { user, tone } = req.body;
+    const { language, user_id, tone } = req.body;
 
-        try {
-            const tasks = await Task.find({
-                // user: user.id,  // Change from req.user._id to user.id
-                tone: tone
-            });
-            if (!tasks) {res.json({message: "no task found"})}
-            res.status(200).json({
-                success: true,
-                tasks
-            }); 
-            
-        } catch (error) {
-             console.log("there is some error while finding the task: ", error) 
-             return res.status(500).json({
-                success: false,
-                message: "Internal server error",
-                error: error.message
-            });
-        }
+    const tasks = await Task.find({
+        language: language,
+        user: new mongoose.Types.ObjectId(user_id),
+        tone: tone
+    });
+    if (!tasks) { res.json({ message: "no task found" }) }
+    try {
+        const tasks = await Task.aggregate([
+            {
+                $match: {
+                    language: language,
+                    user: new mongoose.Types.ObjectId(user_id),
+                    tone: tone
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",           // join users collection
+                    localField: "user",      // tasks.user
+                    foreignField: "_id",     // users._id
+                    as: "user_info"          // nayi field me aa jaayega
+                }
+            },
+            {
+                $unwind: "$user_info"      // array ko object me convert kar
+            },
+            {
+                $project: {
+                    _id: 0,                     // agar id nahi chahiye
+                    title: 1,                    // task ka title
+                    description: 1,              // task ka description
+                    "user_info.name": 1,         // user ka name
+                    "user_info.avatar": 1         // user ka avatar
+                }
+            }
 
-        console.log("Found tasks:", tasks); // Debug log
-
-        if (!tasks || tasks.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No tasks found for this user and tone"
-            });
-        }
-
+        ]);
+        console.log(tasks);
+        
+        // console.log(tasks);
+       let aiResponse = await getAIResponse(tasks)
         res.status(200).json({
             success: true,
-            tasks
+            tasks,
+            aiResponse
         });
-
+    } catch (err) {
+        console.error(err);
+    }
 }
 export { getAllUsers, getSpecificTask };

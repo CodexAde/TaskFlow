@@ -1,17 +1,19 @@
-# 📝 ToDoList App with Admin Dashboard
+# TaskFlow — AI-powered Centralized User Tracking & Admin Dashboard
 
-A **complex ToDoList application** built for real-world task flow management. The app supports user registration, task CRUD (create, read, update, delete), image uploads, and a full **admin dashboard** that can fetch & manage all users and their to‑do lists.
+![Dashboard](./frontend/public/dashboard.png)
+
+A polished platform to monitor, analyze, and manage all platform users from a single pane of glass. TaskFlow replaces the simple to‑do metaphor with a robust centralized tracking system: user health, activity timelines, anomaly detection, and AI-generated insights to help product, ops, and support teams act faster.
 
 ---
 
-## 🚀 Features
+## 🚀 High-level capabilities
 
-* 🔑 **User Registration & Authentication** — Sign up, login, protected routes (JWT)
-* 📋 **Task Management** — Add, edit, delete, and fetch tasks
-* 👥 **Admin Dashboard** — View user lists, fetch each user’s tasks, and manage accounts
-* 🖼️ **Image Uploads** — Attach images to tasks or user profiles (stored in `frontend/public` or cloud)
-* 📊 **Centralized Data Fetching** — Admin can query all users and all tasks
-* ✅ **Role-based access** — Separate user and admin views/permissions
+* 👥 Centralized User Directory — Browse every user, profiles, metadata, and recent activity.
+* 📈 Activity & Session Tracking — View timelines, session summaries, and event feeds per user.
+* 🤖 Generative AI Insights — Auto-summaries, churn risk scoring, and suggested next actions for support.
+* 🛠 Admin Controls — Search, filter, suspend, annotate, and export user data with role-based permissions.
+* 🖼️ Attachments & Media — Upload screenshots or profile images (store demo images in `frontend/public`).
+* ⚠️ Anomaly Detection & Alerts — Detect unusual patterns and notify teams.
 
 ---
 
@@ -25,26 +27,24 @@ A **complex ToDoList application** built for real-world task flow management. Th
 
 ![Registration](./frontend/public/register.png)
 
-### 📋 All Tasks Fetched
+### 📋 All Tasks Fetched (repurposed view: user lists / activity)
 
 ![All Tasks](./frontend/public/alltasks.png)
 
-### ✏️ Edit Task
+### ✏️ Edit Task (repurposed view: edit user / note)
 
 ![Edit Task](./frontend/public/edit.png)
 
-
-
 ---
-
 
 ## 📁 Project structure (example)
 
 ```
-/todolist-app
+/taskflow
   /backend      # API, auth, DB models
   /frontend     # React app (public/, src/)
     /public
+      dashboard.png
       banner.png
       register.png
       alltasks.png
@@ -58,8 +58,8 @@ A **complex ToDoList application** built for real-world task flow management. Th
 1. **Clone repo**
 
 ```bash
-git clone https://github.com/your-username/todolist-app.git
-cd todolist-app
+git clone https://github.com/your-username/taskflow.git
+cd taskflow
 ```
 
 2. **Backend**
@@ -67,14 +67,9 @@ cd todolist-app
 ```bash
 cd backend
 npm install
-# create .env from example and edit values
 cp .env.example .env
-# .env example values
-# MONGO_URI=mongodb+srv://<user>:<pass>@cluster.example.mongodb.net/mydb
-# JWT_SECRET=your_jwt_secret
-# PORT=5000
-
-npm run dev    # (or `npm start` depending on your scripts)
+# set values: MONGO_URI, JWT_SECRET, PORT
+npm run dev
 ```
 
 3. **Frontend**
@@ -82,59 +77,38 @@ npm run dev    # (or `npm start` depending on your scripts)
 ```bash
 cd ../frontend
 npm install
-# If needed, set API URL in environment (e.g. REACT_APP_API_URL=http://localhost:5000)
+# place demo images in frontend/public/ (e.g. dashboard.png)
 npm start
 ```
 
-Open the frontend (usually at `http://localhost:3000`) and the backend at the port set in `.env`.
+Open the frontend (usually at http://localhost:3000) and the backend at the configured port.
 
 ---
 
-## 🔌 API (example endpoints)
+## 🔌 Example API (adapt to your implementation)
 
-> These are example routes — adapt to your implementation.
-
-* `POST /api/auth/register` — Register user (accepts profile image)
-* `POST /api/auth/login` — Login (returns JWT)
-* `GET /api/tasks` — Fetch logged-in user tasks
-* `POST /api/tasks` — Create a task (supports image)
-* `PUT /api/tasks/:id` — Update a task
-* `DELETE /api/tasks/:id` — Delete a task
-* `GET /api/admin/users` — Admin: list all users
-* `GET /api/admin/users/:id/tasks` — Admin: fetch one user’s tasks
+* POST /api/auth/register — Register user (accepts profile image)
+* POST /api/auth/login — Login (returns JWT)
+* GET /api/admin/users — Admin: list all users
+* GET /api/admin/users/:id/activity — Admin: fetch a user's activity stream
+* POST /api/admin/users/:id/actions — Admin: apply actions (suspend, flag, annotate)
 
 ---
-
 
 ## 💡 Notes & recommendations
 
-* **Image handling**: For production, prefer cloud storage (e.g., Cloudinary / S3) instead of committing images to the repo. Keep `public/` for demo screenshots and placeholders.
-* **Validation & security**: Validate uploads, sanitize inputs, and protect admin routes with role checks.
-* **Pagination & filtering**: If many users/tasks exist, add pagination and filters on admin endpoints.
+* For production, use cloud storage for media (S3 / Cloudinary) and keep images out of the repo.
+* Protect admin endpoints with RBAC, strong auth, and audit logs.
+* Use the generative AI outputs responsibly and filter sensitive information.
 
 ---
 
-## 🛠️ Tech Stack (suggested)
+## Where to place the new screenshot
+Add the requested screenshot at:
+- frontend/public/dashboard.png
 
-* Frontend: React.js
-* Backend: Node.js + Express
-* Database: MongoDB (Mongoose)
-* Auth: JWT
-* Image storage: Local `public/` for demo, Cloudinary/AWS S3 for production
+This README references that image as the Dashboard overview shown at the top.
 
----
+--- 
 
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit changes (`git commit -m "feat: describe feature"`)
-4. Push to the branch and open a PR
-
----
-
-
-## 📬 Questions / Contact
-
-If you have questions, open an issue or reach out via your GitHub profile. Happy building! 🎉
 # TaskFlow
