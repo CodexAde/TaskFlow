@@ -6,6 +6,7 @@ import Registering from "../pages/Registering";
 import Dashboard from "../pages/Dashboard";
 import AllTask from "../pages/AllTask";
 import CreateTask from "../pages/CreateTask";
+import Hello from "../pages/Hello";
 
 export default function App() {
   return (
@@ -17,6 +18,8 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/allTasks" element={<AllTask />} />
         <Route path="/create" element={<CreateTask />} />
+        <Route path="/hello" element={<Hello />} />
+
       </Routes>
     </Router>
   );

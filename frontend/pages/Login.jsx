@@ -23,7 +23,6 @@ const navigate = useNavigate();
         },
         body: JSON.stringify(user),
       });
-
       const data = await res.json();
       console.log("Response:", data);
       if (data.success) {
@@ -35,10 +34,11 @@ const navigate = useNavigate();
         } catch (error) {
           console.log(error, "Problem while saving token");
         }
-      }
       setUser({ email: "", password: "" });
       navigate("/allTasks");
 
+      }
+      else alert(data.message);
     } catch (err) {
       console.error("Error:", err);
     }
