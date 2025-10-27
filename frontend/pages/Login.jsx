@@ -177,6 +177,7 @@ const navigate = useNavigate();
         value={user.password}
         type="password"
         placeholder="Enter your password"
+        autoComplete="current-password"
         style={{
           width: "100%",
           padding: "0.75rem",

@@ -164,7 +164,8 @@ const Registering = () => {
             onChange={(e) => setUser({ ...user, email: e.target.value })}
             value={user.email}
             type="email"
-            placeholder="Enter your email"
+            autoComplete="email"
+            placeholder="email"
             style={{
               width: "100%",
               padding: "0.75rem",
@@ -195,7 +196,8 @@ const Registering = () => {
             onChange={(e) => setUser({ ...user, password: e.target.value })}
             value={user.password}
             type="password"
-            placeholder="Enter your password"
+            placeholder="password"
+            autoComplete="current-password"
             style={{
               width: "100%",
               padding: "0.75rem",
