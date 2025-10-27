@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import formateValidator from "../utils/formateValidator";
+import { RegisterService } from "../Service/UserService";
 
 const Registering = () => {
   const [user, setUser] = useState({ name: "", email: "", password: "", avatar: null, language: "" });
@@ -16,44 +18,20 @@ const Registering = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user.name || !user.email || !user.password) {
-      alert("All fields (name, email, password) are required!");
+    const validation = formateValidator(user);
+    if (validation !== true) {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(user.email)) {
-      alert("Please enter a valid email address!");
-      return;
-    }
+    const response = await RegisterService(user);
+    console.log(response);
 
-    if (user.password.length < 6) {
-      alert("Password must be at least 6 characters long!");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:3000/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
-      const data = await res.json();
-      console.log("Response:", data);
-
-      if (data.success) {
+    if (response && response.success === true) {
         setUser({ name: "", email: "", password: "", language: "English" });
         navigate("/login");
       } else {
-        alert(data.message || "Registration failed");
+        alert(response.message || "Registration failed");
       }
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Something went wrong!");
-    }
   };
 
   return (
@@ -232,58 +210,58 @@ const Registering = () => {
         </div>
 
         {/* Avatar + Language select container */}
-<div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "1rem",
-    marginBottom: "1.5rem",
-    width: "100%",
-  }}
->
-  {/* Language select */}
-  <select
-    value={user.language}
-    onChange={(e) => setUser({ ...user, language: e.target.value })}
-    style={{
-      flex: 1,
-      padding: "0.75rem",
-      borderRadius: "0.75rem",
-      background: "rgba(17, 24, 39, 0.6)",
-      border: "1px solid #4b5563",
-      color: "white",
-      outline: "none",
-      boxShadow: "inset 0 2px 4px rgba(0,0,0,0.6)",
-      cursor: "pointer",
-      fontSize: "0.875rem",
-      width: "20%",
-    }}
-  >
-    <option value="English">English</option>
-    <option value="Hindi">Hindi</option>
-    <option value="French">French</option>
-    <option value="Spanish">Spanish</option>
-  </select>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+            marginBottom: "1.5rem",
+            width: "100%",
+          }}
+        >
+          {/* Language select */}
+          <select
+            value={user.language}
+            onChange={(e) => setUser({ ...user, language: e.target.value })}
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              borderRadius: "0.75rem",
+              background: "rgba(17, 24, 39, 0.6)",
+              border: "1px solid #4b5563",
+              color: "white",
+              outline: "none",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.6)",
+              cursor: "pointer",
+              fontSize: "0.875rem",
+              width: "20%",
+            }}
+          >
+            <option value="English">English</option>
+            <option value="Hindi">Hindi</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option>
+          </select>
 
-  {/* Avatar upload */}
-  <input
-    type="file"
-    onChange={(e) => setUser({ ...user, avatar: e.target.files[0] })}
-    style={{
-      flex: 1,
-      padding: "0.75rem",
-      borderRadius: "0.75rem",
-      background: "rgba(17, 24, 39, 0.6)",
-      border: "1px solid #4b5563",
-      color: "white",
-      outline: "none",
-      boxShadow: "inset 0 2px 4px rgba(0,0,0,0.6)",
-      cursor: "pointer",
-      fontSize: "0.875rem",
-      width: "80%",
-    }}
-  />
-</div>
+          {/* Avatar upload */}
+          <input
+            type="file"
+            onChange={(e) => setUser({ ...user, avatar: e.target.files[0] })}
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              borderRadius: "0.75rem",
+              background: "rgba(17, 24, 39, 0.6)",
+              border: "1px solid #4b5563",
+              color: "white",
+              outline: "none",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.6)",
+              cursor: "pointer",
+              fontSize: "0.875rem",
+              width: "80%",
+            }}
+          />
+        </div>
 
         {/* Submit button */}
         <button
@@ -300,12 +278,12 @@ const Registering = () => {
             transition: "all 0.3s ease",
           }}
           onMouseOver={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(to right, #7e22ce, #db2777)")
+          (e.currentTarget.style.background =
+            "linear-gradient(to right, #7e22ce, #db2777)")
           }
           onMouseOut={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(to right, #9333ea, #ec4899)")
+          (e.currentTarget.style.background =
+            "linear-gradient(to right, #9333ea, #ec4899)")
           }
         >
           Sign Up

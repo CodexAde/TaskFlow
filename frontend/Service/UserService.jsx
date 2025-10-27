@@ -1,20 +1,19 @@
-export const RegisterService = async (name, email, password) => {
+export const RegisterService = async (user) => {
     const url = new URL("http://localhost:3000/api/users/register")
-    try {
-        const response = await fetch(url, {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json" 
-            },
-            body: JSON.stringify({ name, email, password })
-        })
-        const data = await response.json()
-        if (!response.ok) {
-            console.log("Failed to create a user", data)
-            return null
-        }
-        return data
-    } catch (error) {
-        console.log("Registeration failed", error)
+       try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      const response = await res.json();
+      console.log("Response:", response);
+      return response;
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Something went wrong!");
     }
 }

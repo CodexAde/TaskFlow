@@ -1,23 +1,84 @@
 import Navbar from "../components/navbar";
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import EnhancedCTAAndFooter from "../components/Homepage";
+
+const Icon = {
+  Gauge: ({ size = 24, color = "#a78bfa" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M12 13l6-6" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 21a9 9 0 1 0-9-9" stroke={color} strokeWidth="2" fill="none" />
+      <circle cx="12" cy="13" r="2" fill={color} />
+    </svg>
+  ),
+  Users: ({ size = 24, color = "#ec4899" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <circle cx="8" cy="9" r="3" stroke={color} strokeWidth="2" />
+      <path d="M2 20c0-3.314 2.686-6 6-6" stroke={color} strokeWidth="2" />
+      <circle cx="17" cy="8" r="3" stroke={color} strokeWidth="2" />
+      <path d="M22 20c0-3.314-2.686-6-6-6" stroke={color} strokeWidth="2" />
+    </svg>
+  ),
+  Activity: ({ size = 24, color = "#22d3ee" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M3 12h4l2 6 4-12 2 6h6"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  Lightning: ({ size = 24, color = "#f59e0b" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke={color} strokeWidth="2" fill="none" />
+    </svg>
+  ),
+};
 
 const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (token) {
-      navigate("/allTasks");
-    }
+    if (token) navigate("/allTasks");
   }, [navigate]);
+
+  const glass = {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+  };
+
+  const pill = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px 14px",
+    borderRadius: "999px",
+    background: "rgba(167,139,250,0.12)",
+    border: "1px solid rgba(167,139,250,0.35)",
+    color: "#c4b5fd",
+    fontWeight: 600,
+    fontSize: "0.85rem",
+  };
+
+  const badge = (text) => (
+    <span style={{ ...pill, marginRight: 8, marginBottom: 8 }}>{text}</span>
+  );
 
   return (
     <div
       style={{
         fontFamily: "Inter, sans-serif",
         color: "white",
-        background: "linear-gradient(to bottom right, #111827, #000000, #1f2937)",
+        background:
+          "radial-gradient(1200px 600px at 10% -10%, #1e293b 0%, rgba(2,6,23,0) 60%), radial-gradient(1000px 500px at 100% 0%, #0ea5e9 0%, rgba(2,6,23,0) 55%), linear-gradient(180deg, #0b1020 0%, #090c16 100%)",
+        minHeight: "100vh",
+        overflowX: "hidden",
       }}
     >
       <Navbar />
@@ -28,324 +89,151 @@ const Home = () => {
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
-          justifyContent: "center",
-          padding: "5rem 2rem",
-          gap: "2rem",
-          minHeight: "100vh"
-
+          justifyContent: "space-between",
+          padding: "5rem 1.5rem 3rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
+          gap: "3rem",
         }}
       >
-        <div style={{ flex: "1 1 400px", maxWidth: "600px" }}>
-          <h2
+        {/* Left Text */}
+        <div
+          style={{
+            flex: "1 1 480px",
+            minWidth: "320px",
+            textAlign: "left",
+          }}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <span style={pill}>
+              <Icon.Lightning size={18} color="#fbbf24" />
+              AI Operations Hub
+            </span>
+          </div>
+
+          <h1
             style={{
-              fontSize: "3rem",
-              fontWeight: "800",
-              background: "linear-gradient(to right, #a78bfa, #ec4899)",
+              fontSize: "clamp(2rem, 5vw, 3.3rem)",
+              fontWeight: 900,
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              background: "linear-gradient(90deg, #e5e7eb, #a78bfa 40%, #ec4899 80%)",
               WebkitBackgroundClip: "text",
               color: "transparent",
               marginBottom: "1rem",
-              lineHeight: "1.2",
             }}
           >
-            Simplify Your Workflow, Supercharge Your Productivity
-          </h2>
+            Track every user, action, and outcome—live.  
+            Elevate your platform with <span style={{ color: "#a78bfa" }}>TaskFlow</span>.
+          </h1>
+
           <p
             style={{
-              color: "#d1d5db",
-              fontSize: "1.2rem",
-              marginBottom: "2rem",
-              lineHeight: "1.6",
+              color: "#cbd5e1",
+              fontSize: "1.05rem",
+              lineHeight: 1.7,
+              maxWidth: "640px",
+              marginBottom: "1.5rem",
             }}
           >
-            Taskflow is your intelligent to-do list app that helps you manage
-            personal and professional tasks with ease. Stay on top of deadlines,
-            collaborate with teams, and focus on what truly matters.
+            TaskFlow is an AI-powered centralized dashboard to monitor users, sessions, and workflows
+            in real time — uncover insights, predict risks, and automate your admin tasks instantly.
           </p>
-          <Link to="/login">
-            <button
-              style={{
-                background: "linear-gradient(to right, #9333ea, #ec4899)",
-                padding: "1rem 2rem",
-                borderRadius: "0.75rem",
-                border: "none",
-                fontWeight: "600",
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(147, 51, 234, 0.5)",
-              }}
-            >
-              Start Using Taskflow
-            </button>
-          </Link>
-        </div>
-        <div style={{ flex: "1 1 400px", textAlign: "center" }}>
-          <img
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
+            {badge("Realtime Activity")}
+            {badge("Anomaly Alerts")}
+            {badge("Role-based Control")}
+            {badge("Workflow Automation")}
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <Link to="/login">
+              <button
+                style={{
+                  background: "linear-gradient(90deg, #7c3aed, #ec4899)",
+                  padding: "0.9rem 1.6rem",
+                  borderRadius: 12,
+                  border: "none",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  color: "white",
+                  boxShadow: "0 8px 24px rgba(236,72,153,0.35)",
+                  transition: "transform 0.25s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+              >
+                Launch Admin Console
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div
             style={{
-              margin: "auto",
-              width: "100%",
-              maxWidth: "550px",
-              borderRadius: "20px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              ...glass,
+              marginTop: 30,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              gap: 16,
+              borderRadius: 16,
+              padding: "16px 18px",
             }}
-            src="https://static.wingify.com/gcp/uploads/sites/18/2022/11/unnamed-27.png"
-            alt="Taskflow Hero"
-          />
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section
-        style={{
-          padding: "5rem 2rem",
-          textAlign: "center",
-          background: "rgba(31,41,55,0.7)",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "2rem",
-            fontWeight: "700",
-            marginBottom: "2rem",
-          }}
-        >
-          How Taskflow Works
-        </h2>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem",
-            maxWidth: "1000px",
-            margin: "0 auto",
-          }}
-        >
-          {[
-            {
-              step: "Add Tasks",
-              img: "https://images.pexels.com/photos/5912284/pexels-photo-5912284.jpeg",
-              desc: "Easily create tasks and categorize them based on projects, urgency, or custom labels.",
-            },
-            {
-              step: "Organize",
-              img: "https://images.pexels.com/photos/670723/pexels-photo-670723.jpeg",
-              desc: "Group tasks, prioritize them, and set deadlines so you stay in control.",
-            },
-            {
-              step: "Track Progress",
-              img: "https://images.pexels.com/photos/7887844/pexels-photo-7887844.jpeg",
-              desc: "Monitor completion rates, visualize productivity, and celebrate wins!",
-            },
-          ].map((s, i) => (
-            <div
-              key={i}
-              style={{
-                background: "rgba(17,24,39,0.85)",
-                padding: "2rem",
-                borderRadius: "1rem",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 6px 12px rgba(0,0,0,0.4)",
-              }}
-            >
-              <img
-                src={s.img}
-                alt={s.step}
-                style={{
-                  marginBottom: "1.5rem",
-                  width: "100%",
-                  borderRadius: "12px",
-                  height: "200px",
-                  objectFit: "cover",
-                }}
-              />
-              <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-                {s.step}
-              </h3>
-              <p style={{ color: "#9ca3af", fontSize: "0.9rem" }}>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section
-        style={{
-          padding: "4rem 2rem",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <h2
-          style={{
-            textAlign: "center",
-            fontSize: "2.5rem",
-            fontWeight: "700",
-            marginBottom: "3rem",
-          }}
-        >
-          Features That Make You Productive
-        </h2>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem",
-          }}
-        >
-          {[
-            {
-              img: "https://www.proofhub.com/articles/wp-content/uploads/2023/12/Task-scheduling-software.jpg",
-              title: "Smart Task Scheduling",
-              desc: "Automatically organize tasks based on urgency, importance, and your daily routine.",
-            },
-            {
-              img: "https://images.pexels.com/photos/8850706/pexels-photo-8850706.jpeg",
-              title: "Custom Reminders",
-              desc: "Never miss a deadline again with powerful reminders tailored to your workflow.",
-            },
-            {
-              img: "https://images.pexels.com/photos/5912280/pexels-photo-5912280.jpeg",
-              title: "Team Collaboration",
-              desc: "Work together seamlessly. Share tasks, assign responsibilities, and track progress.",
-            },
-            {
-              img: "https://images.pexels.com/photos/5882706/pexels-photo-5882706.jpeg",
-              title: "Cloud Sync",
-              desc: "Access your to-do lists anytime, anywhere. All your tasks stay in sync across devices.",
-            },
-          ].map((f, i) => (
-            <div
-              key={i}
-              style={{
-                background: "rgba(31, 41, 55, 0.85)",
-                padding: "2rem",
-                borderRadius: "1rem",
-                textAlign: "center",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
-              }}
-            >
-              <img
-                src={f.img}
-                alt={f.title}
-                style={{
-                  marginBottom: "1.5rem",
-                  width: "100%",
-                  borderRadius: "12px",
-                  height: "200px",
-                  objectFit: "cover",
-                }}
-              />
-              <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-                {f.title}
-              </h3>
-              <p style={{ color: "#9ca3af", fontSize: "0.95rem" }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Productivity Tips Section */}
-      <section
-        style={{
-          padding: "5rem 2rem",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
-        <h2
-          style={{
-            textAlign: "center",
-            fontSize: "2.5rem",
-            fontWeight: "700",
-            marginBottom: "2rem",
-          }}
-        >
-          Master Your Productivity
-        </h2>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "2rem",
-          }}
-        >
-          {[
-            {
-              title: "Stay Focused",
-              img: "https://images.pexels.com/photos/1262304/pexels-photo-1262304.jpeg",
-              desc: "Use Taskflow to cut through distractions and focus on one task at a time.",
-            },
-            {
-              title: "Plan Your Day",
-              img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=80",
-              desc: "Design your day with structured task blocks and never feel overwhelmed.",
-            },
-            {
-              title: "Track Achievements",
-              img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=80",
-              desc: "Celebrate progress by visualizing how much you’ve accomplished.",
-            },
-          ].map((tip, i) => (
-            <div
-              key={i}
-              style={{
-                borderRadius: "1rem",
-                overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 8px 20px rgba(0,0,0,0.5)",
-              }}
-            >
-              <img
-                src={tip.img}
-                alt={tip.title}
-                style={{ width: "100%", height: "200px", objectFit: "cover" }}
-              />
-              <div style={{ padding: "1.5rem", background: "rgba(31,41,55,0.9)" }}>
-                <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-                  {tip.title}
-                </h3>
-                <p style={{ color: "#9ca3af", fontSize: "0.95rem" }}>
-                  {tip.desc}
-                </p>
+          >
+            {[
+              { icon: <Icon.Gauge />, title: "99.95% Uptime", desc: "Global edge" },
+              { icon: <Icon.Users />, title: "1.2M Users", desc: "Tracked live" },
+              { icon: <Icon.Activity />, title: "+37% Throughput", desc: "AI routing" },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {item.icon}
+                <div>
+                  <div style={{ fontWeight: 700 }}>{item.title}</div>
+                  <div style={{ fontSize: 12, color: "#94a3b8" }}>{item.desc}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        {/* Right Image */}
+        <div
+          style={{
+            flex: "1 1 480px",
+            textAlign: "center",
+            marginTop: "1.5rem",
+          }}
+        >
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <img
+              style={{
+                width: "100%",
+                maxWidth: "540px",
+                borderRadius: 20,
+                boxShadow: "0 20px 60px rgba(0,0,0,0.55)",
+                transition: "transform 0.6s ease",
+              }}
+              src="https://static.wingify.com/gcp/uploads/sites/18/2022/11/unnamed-27.png"
+              alt="TaskFlow Overview"
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: "-10%",
+                background:
+                  "radial-gradient(500px 200px at 30% 20%, rgba(124,58,237,0.18), transparent 60%), radial-gradient(500px 200px at 75% 70%, rgba(236,72,153,0.18), transparent 60%)",
+                filter: "blur(10px)",
+                zIndex: -1,
+              }}
+            />
+          </div>
         </div>
       </section>
 
-      {/* Download Section */}
-      <section
-        style={{
-          textAlign: "center",
-          padding: "5rem 2rem",
-          background: "rgba(31,41,55,0.7)",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "2rem",
-            fontWeight: "700",
-            marginBottom: "1rem",
-          }}
-        >
-          Get Taskflow Today
-        </h2>
-        <p style={{ color: "#9ca3af", marginBottom: "2rem", fontSize: "1.1rem" }}>
-          Available on Web, iOS, and Android. Start organizing your life in just
-          a few clicks.
-        </p>
-      </section>
-
-      {/* Footer */}
-      <footer
-        style={{
-          padding: "2rem",
-          textAlign: "center",
-          borderTop: "1px solid rgba(255,255,255,0.1)",
-          color: "#9ca3af",
-        }}
-      >
-        <p>© {new Date().getFullYear()} Taskflow. All rights reserved.</p>
-      </footer>
+      <EnhancedCTAAndFooter />
     </div>
   );
 };
