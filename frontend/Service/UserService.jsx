@@ -1,5 +1,5 @@
 export const RegisterService = async (user) => {
-    const url = new URL("http://localhost:3000/api/users/register")
+    const url = new URL("https://taskflow-6p2d.onrender.com/api/users/register");
        try {
       const res = await fetch(url, {
         method: "POST",

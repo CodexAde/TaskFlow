@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskNavbar from "./TaskNavbar";
 const AllTask = () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [tasks, setTasks] = useState([]);
   const [editedTasks, setEditedTasks] = useState({
     title: "To do",
@@ -13,7 +14,7 @@ const AllTask = () => {
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await fetch("http://localhost:3000/api/tasks/getAllTasks", {
+        const res = await fetch(`${backendUrl}/api/tasks/getAllTasks`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

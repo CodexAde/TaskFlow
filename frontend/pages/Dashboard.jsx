@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 export default function Dashboard() {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [todoInfo, setTodoInfo] = useState({ language: null, user: null, style: null });
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [users, setUsers] = useState([]);
@@ -136,7 +138,7 @@ export default function Dashboard() {
 
   const fetchUsers = async (lang) => {
     try {
-      const res = await fetch("http://localhost:3000/api/dashboard/", {
+      const res = await fetch(`${backendUrl}/api/dashboard/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ language: lang }),
@@ -180,7 +182,7 @@ export default function Dashboard() {
     };
     console.log("Sending request with:", info);
     try {
-      const res = await fetch("http://localhost:3000/api/dashboard/task", {
+      const res = await fetch(`${backendUrl}/api/dashboard/task`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

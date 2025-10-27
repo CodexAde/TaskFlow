@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [user, setUser] = useState({ email: "", password: "" });
 const navigate = useNavigate();
     useEffect(() => {
@@ -15,7 +16,7 @@ const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3000/api/users/login", {
+        const res = await fetch(`${backendUrl}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

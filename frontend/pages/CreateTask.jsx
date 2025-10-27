@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreateTask = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [task, setTask] = useState({
     title: "To do",
     description: "i have to do this task",
@@ -16,7 +17,7 @@ const CreateTask = () => {
 
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch("http://localhost:3000/api/tasks/create", {
+      const res = await fetch(`${backendUrl}/api/tasks/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
