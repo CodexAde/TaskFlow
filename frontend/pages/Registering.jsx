@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import formateValidator from "../utils/formateValidator";
-import { RegisterService } from "../Service/UserService";
+import UserContext from "../context/userContext";
+
 
 const Registering = () => {
   const [user, setUser] = useState({ name: "", email: "", password: "", avatar: null, language: "" });
+  const { setCredentials, credentials, RegisteringUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,16 +24,16 @@ const Registering = () => {
     if (validation !== true) {
       return;
     }
-
-    const response = await RegisterService(user);
-    console.log(response);
+    setCredentials(user);
+    const response = await RegisteringUser(credentials)
 
     if (response && response.success === true) {
-        setUser({ name: "", email: "", password: "", language: "English" });
-        navigate("/login");
-      } else {
-        alert(response.message || "Registration failed");
-      }
+      setUser({ name: "", email: "", password: "", language: "English" });
+      navigate("/login");
+    } else {
+      alert(response.message || "Registration failed");
+    }
+
   };
 
   return (

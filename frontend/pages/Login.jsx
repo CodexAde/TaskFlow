@@ -10,7 +10,6 @@ const navigate = useNavigate();
       if (token) {
         navigate("/allTasks");
       }
-      console.log("its done you authenticated");
     }, [navigate]);
 
   const handleSubmit = async (e) => {
@@ -146,6 +145,7 @@ const navigate = useNavigate();
         value={user.email}
         type="email"
         placeholder="Enter your email"
+        autoComplete="email"
         style={{
           width: "100%",
           padding: "0.75rem",

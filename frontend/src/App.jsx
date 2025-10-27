@@ -7,9 +7,11 @@ import Dashboard from "../pages/Dashboard";
 import AllTask from "../pages/AllTask";
 import CreateTask from "../pages/CreateTask";
 import Hello from "../pages/Hello";
+import UserContextProvider from "../context/userStates";
 
 export default function App() {
   return (
+    <UserContextProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -22,5 +24,6 @@ export default function App() {
 
       </Routes>
     </Router>
+    </UserContextProvider>
   );
 }
