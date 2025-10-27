@@ -40,8 +40,8 @@ async function Registering(req, res) {
       res.status(201).json({
         success: true,
         user: newUser,
-        token: token,
-        avatar: avatar.url
+        // token: token,
+        // avatar: avatar.url
       });
     }
 
@@ -49,18 +49,18 @@ async function Registering(req, res) {
       if (!newUser) {
         return res.status(400).json({ success: false, message: "Failed to create user" });
       }
-      const token = jwt.sign(
-        { name, email, _id: newUser._id },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
-      );
-      newUser.token = token;
-      await newUser.save();
-      console.log("New user created:", newUser);
+      // const token = jwt.sign(
+      //   { name, email, _id: newUser._id },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: process.env.JWT_EXPIRES_IN }
+      // );
+      // newUser.token = token;
+      // await newUser.save();
+      // console.log("New user created:", newUser);
       res.status(201).json({
         success: true,
         user: newUser,
-        token: token,
+        // token: token,
       });
   } catch (error) {
     console.log("bn nhi payi hai dost teri id", error);

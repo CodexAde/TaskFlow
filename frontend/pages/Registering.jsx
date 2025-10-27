@@ -2,12 +2,13 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import formateValidator from "../utils/formateValidator";
 import UserContext from "../context/userContext";
+import { Link } from "react-router-dom";
 
 const Registering = () => {
   const [user, setUser] = useState({
-    name: "testuser",
-    email: "testuser@gmail.com",
-    password: "testuser",
+    name: "",
+    email: "",
+    password: "",
     avatar: null,
     language: "",
   });
@@ -27,9 +28,11 @@ const Registering = () => {
     if (validation !== true) return;
 
     setCredentials(user);
-    setLoading(true); // 🔥 show loader
-    const response = await RegisteringUser(credentials);
-    setLoading(false); // 🧊 hide loader
+    console.log("using this user to sent be sent: ", credentials);
+
+    setLoading(true);
+    const response = await RegisteringUser(user);
+    setLoading(false); 
 
     if (response && response.success === true) {
       setUser({ name: "", email: "", password: "", language: "English" });
@@ -51,29 +54,93 @@ const Registering = () => {
         padding: "1rem",
       }}
     >
-      {loading ? (
-        // 🔥 Spinner UI
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "1.5rem",
-          }}
-        >
-          <div
-            style={{
-              width: "4rem",
-              height: "4rem",
-              border: "5px solid rgba(255, 255, 255, 0.2)",
-              borderTop: "5px solid #a78bfa",
-              borderRadius: "50%",
-              animation: "spin 1.2s linear infinite, fadeColor 2s ease-in-out infinite",
-            }}
-          ></div>
-          <p style={{ color: "#a78bfa", fontWeight: "500" }}>Creating your account...</p>
-        </div>
-      ) : (
+{loading ? (
+  // 🌈 Animated Loader UI
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "1.75rem",
+      animation: "fadeIn 0.8s ease-out",
+    }}
+  >
+    <div
+      style={{
+        position: "relative",
+        width: "4.5rem",
+        height: "4.5rem",
+      }}
+    >
+      {/* outer ring */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          borderRadius: "50%",
+          border: "5px solid rgba(255, 255, 255, 0.15)",
+          borderTopColor: "#a78bfa",
+          animation: "spin 1.2s linear infinite",
+          boxShadow: "0 0 20px rgba(167,139,250,0.3)",
+        }}
+      ></div>
+
+      {/* glowing center pulse */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: "1.5rem",
+          height: "1.5rem",
+          background: "radial-gradient(circle, #a78bfa, #9333ea)",
+          borderRadius: "50%",
+          transform: "translate(-50%, -50%)",
+          animation: "pulseGlow 1.8s ease-in-out infinite",
+          filter: "blur(2px)",
+        }}
+      ></div>
+    </div>
+
+    <p
+      style={{
+        color: "#a78bfa",
+        fontWeight: "600",
+        fontSize: "1.05rem",
+        letterSpacing: "0.5px",
+        animation: "fadeText 1.5s ease-in-out infinite",
+      }}
+    >
+      Creating your account...
+    </p>
+
+    {/* animation styles */}
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes pulseGlow {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+        50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.6; }
+      }
+
+      @keyframes fadeText {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `}</style>
+  </div>
+) : (
         // 🔥 Signup form
         <form
           onSubmit={handleSubmit}
@@ -179,7 +246,7 @@ const Registering = () => {
           ))}
 
           {/* Language and Avatar */}
-          <div
+          {/* <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -221,7 +288,7 @@ const Registering = () => {
                 width: "100%",
               }}
             />
-          </div>
+          </div> */}
 
           <button
             type="submit"
@@ -248,7 +315,7 @@ const Registering = () => {
               marginTop: "1rem",
             }}
           >
-            By signing up, you agree to our{" "}
+            Already have an account?{" "}
             <span
               style={{
                 color: "#a78bfa",
@@ -256,7 +323,7 @@ const Registering = () => {
                 textDecoration: "underline",
               }}
             >
-              terms & conditions
+              <Link to="/login">Login here</Link>
             </span>
           </p>
         </form>

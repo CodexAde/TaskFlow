@@ -147,27 +147,69 @@ const Home = () => {
             {badge("Workflow Automation")}
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link to="/login">
-              <button
-                style={{
-                  background: "linear-gradient(90deg, #7c3aed, #ec4899)",
-                  padding: "0.9rem 1.6rem",
-                  borderRadius: 12,
-                  border: "none",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  color: "white",
-                  boxShadow: "0 8px 24px rgba(236,72,153,0.35)",
-                  transition: "transform 0.25s ease",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-              >
-                Launch Admin Console
-              </button>
-            </Link>
-          </div>
+<div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+  {/* 🚀 Launch Admin Console */}
+  <Link to="/login">
+    <button
+      style={{
+        background: "linear-gradient(90deg, #7c3aed, #ec4899)",
+        padding: "0.9rem 1.6rem",
+        borderRadius: 12,
+        border: "none",
+        fontWeight: 700,
+        cursor: "pointer",
+        color: "white",
+        boxShadow: "0 8px 24px rgba(236,72,153,0.35)",
+        transition: "transform 0.25s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+    >
+      Launch Admin Console
+    </button>
+  </Link>
+
+  {/* 💎 Admin Control Button */}
+  <Link to="/dashboard">
+    <button
+      style={{
+        position: "relative",
+        padding: "0.9rem 1.6rem",
+        borderRadius: 12,
+        border: "2px solid transparent",
+        fontWeight: 700,
+        cursor: "pointer",
+        color: "#f5f3ff",
+        background:
+          "linear-gradient(90deg, #1e1e2e, #2e2e3e) padding-box, linear-gradient(90deg, #6366f1, #ec4899, #8b5cf6) border-box",
+        boxShadow: "0 0 25px rgba(139,92,246,0.3)",
+        transition: "all 0.3s ease",
+        backdropFilter: "blur(12px)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 0 40px rgba(236,72,153,0.45)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 0 25px rgba(139,92,246,0.3)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
+    >
+      Admin Control
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: 12,
+          background: "linear-gradient(90deg, #ec4899, #8b5cf6, #6366f1)",
+          opacity: 0.15,
+          filter: "blur(8px)",
+          zIndex: -1,
+        }}
+      ></div>
+    </button>
+  </Link>
+</div>
 
           {/* Stats */}
           <div
@@ -214,7 +256,7 @@ const Home = () => {
                 boxShadow: "0 20px 60px rgba(0,0,0,0.55)",
                 transition: "transform 0.6s ease",
               }}
-              src="https://static.wingify.com/gcp/uploads/sites/18/2022/11/unnamed-27.png"
+              src="../public/dashboard.png"
               alt="TaskFlow Overview"
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}

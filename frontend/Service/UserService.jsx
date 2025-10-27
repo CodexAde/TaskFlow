@@ -1,5 +1,7 @@
 export const RegisterService = async (user) => {
-    const url = new URL("https://taskflow-6p2d.onrender.com/api/users/register");
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  
+    const url = new URL(`${backendUrl}/api/users/register`);
        try {
       const res = await fetch(url, {
         method: "POST",
