@@ -20,6 +20,7 @@ const userSchema =  new mongoose.Schema({
     avatar:{
         type : String,
         // required : true,
+        default : "https://avatar.iran.liara.run/public/28"
     },
     token:{
         type : String,

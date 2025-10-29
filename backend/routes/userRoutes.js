@@ -7,9 +7,6 @@ const router = express.Router();
 router.post("/register", upload.single("avatar"), Registering);
 
 router.post("/login", Login);
-
-
-
 router.post("/", authenticatingToken);
 
 

@@ -28,11 +28,7 @@ const taskSchema = new mongoose.Schema({
         // enum: ["Happy", "Sad", "Angry", "Motivated", "Neutral"],
         default: "Angry"
     },
-    language: {
-        type: String,
-        // enum: ["English", "Spanish", "French", "German", "Chinese"],
-        default: "English"
-    }
+
 }, { timestamps: true })
 
 const Task = mongoose.model("Task", taskSchema)

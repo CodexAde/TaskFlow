@@ -1,14 +1,17 @@
 export const RegisterService = async (user) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  
+
     const url = new URL(`${backendUrl}/api/users/register`);
+    const formData = new FormData();
+    formData.append("name", user.name);
+    formData.append("email", user.email);
+    formData.append("password", user.password);
+    formData.append("language", user.language);
+    formData.append("avatar", user.avatar);
        try {
       const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
+      method: "POST",
+      body: formData,
       });
 
       const response = await res.json();

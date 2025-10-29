@@ -26,16 +26,18 @@ const Registering = () => {
 
     const validation = formateValidator(user);
     if (validation !== true) return;
+    
 
     setCredentials(user);
-    console.log("using this user to sent be sent: ", credentials);
 
     setLoading(true);
+
     const response = await RegisteringUser(user);
+
     setLoading(false); 
 
     if (response && response.success === true) {
-      setUser({ name: "", email: "", password: "", language: "English" });
+      setUser({ name: "", email: "", password: "", language: "" });
       navigate("/login");
     } else {
       alert(response.message || "Registration failed");
@@ -246,7 +248,7 @@ const Registering = () => {
           ))}
 
           {/* Language and Avatar */}
-          {/* <div
+          <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -254,25 +256,26 @@ const Registering = () => {
               marginBottom: "1.5rem",
             }}
           >
-            <select
-              value={user.language}
-              onChange={(e) => setUser({ ...user, language: e.target.value })}
-              style={{
-                flex: 1,
-                padding: "0.75rem",
-                borderRadius: "0.75rem",
-                background: "rgba(17, 24, 39, 0.6)",
-                border: "1px solid #4b5563",
-                color: "white",
-                outline: "none",
-                cursor: "pointer",
-              }}
-            >
-              <option value="English">English</option>
-              <option value="Hindi">Hindi</option>
-              <option value="French">French</option>
-              <option value="Spanish">Spanish</option>
-            </select>
+<select
+  value={user.language}
+  onChange={(e) => setUser({ ...user, language: e.target.value })}
+  style={{
+    flex: 1,
+    padding: "0.75rem",
+    borderRadius: "0.75rem",
+    background: "rgba(17, 24, 39, 0.6)",
+    border: "1px solid #4b5563",
+    color: "white",
+    outline: "none",
+    cursor: "pointer",
+  }}
+>
+  <option >Select language</option>
+  <option value="English">English</option>
+  <option value="Hindi">Hindi</option>
+  <option value="French">French</option>
+  <option value="Spanish">Spanish</option>
+</select>
 
             <input
               type="file"
@@ -288,7 +291,7 @@ const Registering = () => {
                 width: "100%",
               }}
             />
-          </div> */}
+          </div>
 
           <button
             type="submit"

@@ -5,11 +5,14 @@ import { getAIResponse } from '../utils/gemini.js';
 
 async function getAllUsers(req, res) {
     try {
-        const getUsers = await User.find();
+        const { language } = req.body;
+        console.log("got from frontend: ", req.body);
+        
+        const getUsers = await User.find({ language: language});
         const users = getUsers.map(user => ({
             id: user._id,
             name: user.name,
-            avatar: user.avatar ?? null
+            avatar: user.avatar
         }));
         res.status(200).json(users);
     } catch (error) {
