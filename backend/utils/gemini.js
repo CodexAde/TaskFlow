@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function getAIResponse(tasks) {
     if (!tasks || tasks.length === 0) {
-        console.log("No tasks received");
+        // console.log("No tasks received");
         return null;
     }
 
@@ -23,7 +23,7 @@ export async function getAIResponse(tasks) {
         });
 
         const aiResponse = response.choices[0].message;
-        console.log("AI response:", aiResponse);
+        // console.log("AI response:", aiResponse);
         return aiResponse.content;  // Return the text content
     } catch (error) {
         console.error("Error sending AI response:", error);

@@ -20,7 +20,7 @@ const userSchema =  new mongoose.Schema({
     avatar:{
         type : String,
         // required : true,
-        default : "https://avatar.iran.liara.run/public/28"
+        // default: "https://img.icons8.com/?size=100&id=EInDLGZwVHf7&format=png&color=000000"
     },
     token:{
         type : String,
