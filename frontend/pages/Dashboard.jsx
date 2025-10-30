@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [toshow, setToshow] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false); // New state for users loading
   const [isMobile, setIsMobile] = useState(false);
   const [currentPanel, setCurrentPanel] = useState('welcome'); // 'welcome', 'language', 'users', 'tones', 'final'
 
@@ -48,11 +49,17 @@ export default function Dashboard() {
   };
 
   // Desktop navigation (original logic)
-  const handleSelectLanguage = (lang) => {
+  const handleSelectLanguage = async (lang) => {
     setTodoInfo({ language: lang, user: null, style: null });
     setToshow(null);
     setIsLoading(false);
+    setIsLoadingUsers(true); // Start loading users
+    
     if (isMobile) navigateToPanel('users');
+    
+    // Fetch users immediately
+    await fetchUsers(lang);
+    setIsLoadingUsers(false);
   };
 
   const handleSelectUser = (user) => {
@@ -75,7 +82,101 @@ export default function Dashboard() {
     if (isMobile) setCurrentPanel('tones');
   };
 
-  // Styles
+  // Skeleton Styles
+  const skeletonBaseStyle = {
+    background: "linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)",
+    backgroundSize: "200% 100%",
+    animation: "skeleton-loading 1.5s infinite",
+    borderRadius: "12px",
+  };
+
+  const skeletonUserCardStyle = {
+    ...skeletonBaseStyle,
+    height: "60px",
+    margin: "8px 0",
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+    padding: "16px",
+    borderRadius: "16px",
+  };
+
+  const skeletonAvatarStyle = {
+    ...skeletonBaseStyle,
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+  };
+
+  const skeletonTextStyle = {
+    ...skeletonBaseStyle,
+    height: "16px",
+    width: "100%",
+    marginBottom: "4px",
+  };
+
+  const skeletonToneCardStyle = {
+    ...skeletonBaseStyle,
+    height: "56px",
+    margin: "8px 0",
+    borderRadius: "12px",
+    padding: "16px",
+    textAlign: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  const skeletonTaskCardStyle = {
+    ...skeletonBaseStyle,
+    height: "120px",
+    margin: "12px 0",
+    padding: "20px",
+    borderRadius: "16px",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "16px",
+  };
+
+  const skeletonTaskAvatarStyle = {
+    ...skeletonBaseStyle,
+    width: "100px",
+    height: "48px",
+    borderRadius: "50%",
+    flexShrink: 0,
+    backgroundColor: "#d0d0d0",
+  };
+
+  const skeletonTaskTitleStyle = {
+    ...skeletonBaseStyle,
+    height: "20px",
+    width: "100%",
+    marginBottom: "12px",
+  };
+
+  const skeletonTaskDescriptionStyle = {
+    ...skeletonBaseStyle,
+    height: "16px",
+    width: "95%",
+    marginBottom: "8px",
+  };
+
+  const skeletonTaskDetailStyle = {
+    ...skeletonBaseStyle,
+    height: "14px",
+    width: "60%",
+    marginBottom: "4px",
+  };
+
+  const skeletonAiResponseStyle = {
+    ...skeletonBaseStyle,
+    height: "80px",
+    marginTop: "16px",
+    padding: "16px",
+    borderRadius: "12px",
+  };
+
+  // Original Styles (keeping all your existing styles)
   const mainBackground = {
     background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
     minHeight: "100vh",
@@ -291,7 +392,38 @@ export default function Dashboard() {
     textAlign: "center"
   };
 
-  // Data fetching
+  // Data fetching for users
+  const fetchUsers = async (lang) => {
+    try {
+      setIsLoadingUsers(true);
+      const res = await fetch(`${backendUrl}/api/dashboard/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: lang }),
+      });
+
+      const data = await res.json();
+      console.log("Fetched data:", data);
+
+      // Map default avatar
+      const updatedData = (data.users || data).map((user) => ({
+        ...user,
+        avatar:
+          user.avatar && user.avatar.trim() !== ""
+            ? user.avatar
+            : "https://img.icons8.com/?size=100&id=EInDLGZwVHf7&format=png&color=000000",
+      }));
+
+      setUsers(updatedData);
+      console.log("Updated users:", updatedData);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setUsers([]); // Clear users on error
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
   useEffect(() => {
     if (todoInfo.language) {
       fetchUsers(todoInfo.language);
@@ -301,246 +433,299 @@ export default function Dashboard() {
     }
   }, [todoInfo.language]);
 
-const fetchUsers = async (lang) => {
-  try {
-    const res = await fetch(`${backendUrl}/api/dashboard/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: lang }),
-    });
+  useEffect(() => {
+    if (!selectedStyle) return;
+    handleGetTodo();
+    if (isMobile) navigateToPanel('final');
+  }, [selectedStyle]);
 
-    const data = await res.json();
-    console.log("Fetched data:", data);
-
-    // ✅ Map se default avatar laga dena
-    const updatedData = (data.users || data).map((user) => ({
-      ...user,
-      avatar:
-        user.avatar && user.avatar.trim() !== ""
-          ? user.avatar
-          : "https://img.icons8.com/?size=100&id=EInDLGZwVHf7&format=png&color=000000",
-    }));
-
-    // ✅ Set users
-    setUsers(updatedData);
-
-    console.log("Updated users:", updatedData);
-  } catch (err) {
-    console.error("Error fetching users:", err);
-  }
-};
-
-    useEffect(() => {
-      if (!selectedStyle) return;
-      handleGetTodo();
-      if (isMobile) navigateToPanel('final');
-    }, [selectedStyle]);
-
-    const handleGetTodo = async () => {
-      setIsLoading(true);
-      const info = {
-        language: todoInfo.language,
-        user_id: todoInfo.user.id,
-        tone: selectedStyle
-      };
-      console.log("user: ", users);
-
-      // console.log("Sending request with:", info);
-      try {
-        const res = await fetch(`${backendUrl}/api/dashboard/task`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(info)
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-        if (data.success) {
-          setToshow(data);
-          // console.log("Fetched Todo:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching todo:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const handleGetTodo = async () => {
+    setIsLoading(true);
+    const info = {
+      language: todoInfo.language,
+      user_id: todoInfo.user.id,
+      tone: selectedStyle
     };
+    console.log("user: ", users);
 
-    // Icons
-    const BellIcon = () => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        fill="currentColor"
-        className="bi bi-bell"
-        viewBox="0 0 16 16"
-        style={iconStyle}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-      >
-        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
-      </svg>
-    );
+    try {
+      const res = await fetch(`${backendUrl}/api/dashboard/task`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(info)
+      });
 
-    const GearIcon = () => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        fill="currentColor"
-        className="bi bi-gear"
-        viewBox="0 0 16 16"
-        style={iconStyle}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-      >
-        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
-        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
-      </svg>
-    );
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+      }
 
-    const PersonIcon = () => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        fill="currentColor"
-        className="bi bi-person"
-        viewBox="0 0 16 16"
-        style={iconStyle}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-      >
-        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
-      </svg>
-    );
+      const data = await res.json();
+      if (data.success) {
+        setToshow(data);
+      }
+    } catch (error) {
+      console.error("Error fetching todo:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const SadFaceIcon = () => (
-      <svg
-        width={isMobile ? "60" : "80"}
-        height={isMobile ? "60" : "80"}
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ marginBottom: "16px", opacity: 0.5 }}
-      >
-        <circle cx="12" cy="12" r="10" stroke="#ccc" strokeWidth="2" fill="none" />
-        <circle cx="8" cy="8" r="1.5" fill="#999" />
-        <circle cx="16" cy="8" r="1.5" fill="#999" />
-        <path d="M8 15c1 0 2 0 3 0c0 -1 0 -2 0 -2" stroke="#999" strokeWidth="2" strokeLinecap="round" fill="none" />
-        <path d="M15 15a3 3 0 0 0 -6 0" stroke="#999" strokeWidth="2" fill="none" />
-      </svg>
-    );
+  // Skeleton Components
+  const SkeletonUserCard = () => (
+    <div style={skeletonUserCardStyle}>
+      <div style={skeletonAvatarStyle}></div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div style={skeletonTextStyle}></div>
+        <div style={{ ...skeletonTextStyle, width: "60%" }}></div>
+      </div>
+    </div>
+  );
 
-    const LoadingSpinner = () => (
-      <div
-        style={{
-          width: "32px",
-          height: "32px",
-          border: "3px solid rgba(59, 130, 246, 0.1)",
-          borderTop: "3px solid #3b82f6",
-          borderRadius: "50%",
-          animation: "spin 1s linear infinite",
-          marginBottom: "12px",
-        }}
-      />
-    );
+  const SkeletonToneCard = () => (
+    <div style={skeletonToneCardStyle}></div>
+  );
 
-    // Mobile panels content
-    const renderMobilePanel = () => {
-      switch (currentPanel) {
-        case 'welcome':
-          return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "40px 20px" }}>
-              <h1 style={{ marginBottom: "16px", color: "#333", fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: "300" }}>Welcome to Codevern Dashboard</h1>
-              <p style={{ color: "#666", fontSize: isMobile ? "1rem" : "1.2rem", marginBottom: "24px", lineHeight: "1.5" }}>
-                Select a language from the sidebar to get started with user tones and tasks.
-              </p>
-              <p style={{ color: "#888", fontSize: isMobile ? "0.9rem" : "1rem", lineHeight: "1.4" }}>
-                Manage multilingual todos with AI-generated responses tailored to user preferences.
-              </p>
-              <button
-                onClick={() => navigateToPanel('language')}
-                style={{
-                  marginTop: "24px",
-                  padding: "12px 24px",
-                  background: "rgba(255, 255, 255, 0.9)",
-                  color: "#374151", // Dark gray for text
-                  border: "1px solid rgba(0, 0, 0, 0.08)",
-                  borderRadius: "25px",
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
-                  backdropFilter: "blur(10px)",
-                  transition: "all 0.2s ease",
-                  position: "relative",
-                  overflow: "hidden"
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "rgba(255, 255, 255, 0.95)";
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 8px 25px rgba(0, 0, 0, 0.12)";
-                  e.target.style.border = "1px solid rgba(0, 0, 0, 0.12)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "rgba(255, 255, 255, 0.9)";
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)";
-                  e.target.style.border = "1px solid rgba(0, 0, 0, 0.08)";
-                }}
-              >
-                Get Started
+  const SkeletonTaskCard = () => (
+    <div style={skeletonTaskCardStyle}>
+      <div style={skeletonTaskAvatarStyle}></div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div style={skeletonTaskTitleStyle}></div>
+        <div style={skeletonTaskDescriptionStyle}></div>
+        <div style={skeletonTaskDetailStyle}></div>
+        <div style={skeletonTaskDetailStyle}></div>
+        <div style={{ ...skeletonTaskDetailStyle, width: "90%" }}></div>
+      </div>
+    </div>
+  );
+
+  const SkeletonAIResponse = () => (
+    <div style={skeletonAiResponseStyle}></div>
+  );
+
+  // Render Skeleton for Users Panel
+  const renderUsersSkeleton = () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+      <div style={{ 
+        height: "24px", 
+        width: "80%", 
+        ...skeletonBaseStyle, 
+        marginBottom: "24px",
+        borderRadius: "8px"
+      }}></div>
+      {[...Array(4)].map((_, index) => (
+        <SkeletonUserCard key={index} />
+      ))}
+    </div>
+  );
+
+  // Render Skeleton for Tones Panel
+  const renderTonesSkeleton = () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+      <div style={{ 
+        height: "24px", 
+        width: "60%", 
+        ...skeletonBaseStyle, 
+        marginBottom: "24px",
+        borderRadius: "8px"
+      }}></div>
+      {[...Array(6)].map((_, index) => (
+        <SkeletonToneCard key={index} />
+      ))}
+    </div>
+  );
+
+  // Render Skeleton for Tasks Panel
+  const renderTasksSkeleton = () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+      {[...Array(2)].map((_, index) => (
+        <SkeletonTaskCard key={index} />
+      ))}
+      {/* <SkeletonAIResponse /> */}
+    </div>
+  );
+
+  // Icons (keeping all your existing icons)
+  const BellIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      fill="currentColor"
+      className="bi bi-bell"
+      viewBox="0 0 16 16"
+      style={iconStyle}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
+    >
+      <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
+    </svg>
+  );
+
+  const GearIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      fill="currentColor"
+      className="bi bi-gear"
+      viewBox="0 0 16 16"
+      style={iconStyle}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
+    >
+      <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+      <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+    </svg>
+  );
+
+  const PersonIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      fill="currentColor"
+      className="bi bi-person"
+      viewBox="0 0 16 16"
+      style={iconStyle}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
+    >
+      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
+    </svg>
+  );
+
+  const SadFaceIcon = () => (
+    <svg
+      width={isMobile ? "60" : "80"}
+      height={isMobile ? "60" : "80"}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginBottom: "16px", opacity: 0.5 }}
+    >
+      <circle cx="12" cy="12" r="10" stroke="#ccc" strokeWidth="2" fill="none" />
+      <circle cx="8" cy="8" r="1.5" fill="#999" />
+      <circle cx="16" cy="8" r="1.5" fill="#999" />
+      <path d="M8 15c1 0 2 0 3 0c0 -1 0 -2 0 -2" stroke="#999" strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M15 15a3 3 0 0 0 -6 0" stroke="#999" strokeWidth="2" fill="none" />
+    </svg>
+  );
+
+  const LoadingSpinner = () => (
+    <div
+      style={{
+        width: "32px",
+        height: "32px",
+        border: "3px solid rgba(59, 130, 246, 0.1)",
+        borderTop: "3px solid #3b82f6",
+        borderRadius: "50%",
+        animation: "spin 1s linear infinite",
+        marginBottom: "12px",
+      }}
+    />
+  );
+
+  // Mobile panels content with skeletons
+  const renderMobilePanel = () => {
+    switch (currentPanel) {
+      case 'welcome':
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "40px 20px" }}>
+            <h1 style={{ marginBottom: "16px", color: "#333", fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: "300" }}>Welcome to Codevern Dashboard</h1>
+            <p style={{ color: "#666", fontSize: isMobile ? "1rem" : "1.2rem", marginBottom: "24px", lineHeight: "1.5" }}>
+              Select a language from the sidebar to get started with user tones and tasks.
+            </p>
+            <p style={{ color: "#888", fontSize: isMobile ? "0.9rem" : "1rem", lineHeight: "1.4" }}>
+              Manage multilingual todos with AI-generated responses tailored to user preferences.
+            </p>
+            <button
+              onClick={() => navigateToPanel('language')}
+              style={{
+                marginTop: "24px",
+                padding: "12px 24px",
+                background: "rgba(255, 255, 255, 0.9)",
+                color: "#374151",
+                border: "1px solid rgba(0, 0, 0, 0.08)",
+                borderRadius: "25px",
+                fontSize: "16px",
+                fontWeight: 500,
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
+                backdropFilter: "blur(10px)",
+                transition: "all 0.2s ease",
+                position: "relative",
+                overflow: "hidden"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = "rgba(255, 255, 255, 0.95)";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 8px 25px rgba(0, 0, 0, 0.12)";
+                e.target.style.border = "1px solid rgba(0, 0, 0, 0.12)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = "rgba(255, 255, 255, 0.9)";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)";
+                e.target.style.border = "1px solid rgba(0, 0, 0, 0.08)";
+              }}
+            >
+              Get Started
+            </button>
+          </div>
+        );
+
+      case 'language':
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <div style={mobileHeaderStyle}>
+              <button onClick={goBack} style={backButtonStyle}>
+                ← Back
               </button>
-
+              <h2 style={panelTitleStyle}>Select Language</h2>
+              <div style={{ width: "36px" }}></div>
             </div>
-          );
-
-        case 'language':
-          return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-              <div style={mobileHeaderStyle}>
-                <button onClick={goBack} style={backButtonStyle}>
-                  ← Back
-                </button>
-                <h2 style={panelTitleStyle}>Select Language</h2>
-                <div style={{ width: "36px" }}></div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
-                {languages.map((lang) => (
-                  <div
-                    key={lang}
-                    style={glassCardStyle}
-                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, hoverGlassStyle)}
-                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, glassCardStyle)}
-                    onClick={() => handleSelectLanguage(lang)}
-                  >
-                    {lang}
-                  </div>
-                ))}
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
+              {languages.map((lang) => (
+                <div
+                  key={lang}
+                  style={glassCardStyle}
+                  onMouseEnter={(e) => Object.assign(e.currentTarget.style, hoverGlassStyle)}
+                  onMouseLeave={(e) => Object.assign(e.currentTarget.style, glassCardStyle)}
+                  onClick={() => handleSelectLanguage(lang)}
+                >
+                  {lang}
+                </div>
+              ))}
             </div>
-          );
+          </div>
+        );
 
-        case 'users':
-          return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-              <div style={mobileHeaderStyle}>
-                <button onClick={goBack} style={backButtonStyle}>
-                  ← Back
-                </button>
-                <h2 style={panelTitleStyle}>{todoInfo.language} Users</h2>
-                <div style={{ width: "36px" }}></div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
-                {users.map((user) => (
+      case 'users':
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <div style={mobileHeaderStyle}>
+              <button onClick={goBack} style={backButtonStyle}>
+                ← Back
+              </button>
+              <h2 style={panelTitleStyle}>{todoInfo.language} Users</h2>
+              <div style={{ width: "36px" }}></div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
+              {isLoadingUsers ? (
+                <div style={{ width: "100%", padding: "20px" }}>
+                  {[...Array(4)].map((_, index) => (
+                    <SkeletonUserCard key={index} />
+                  ))}
+                </div>
+              ) : users.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 20px", color: "#666" }}>
+                  <p>No users found for this language</p>
+                </div>
+              ) : (
+                users.map((user) => (
                   <div
                     key={user.id}
                     style={{
@@ -561,7 +746,6 @@ const fetchUsers = async (lang) => {
                     }
                     onClick={() => handleSelectUser(user)}
                   >
-                    {/* 🖼️ Avatar */}
                     <img
                       src={user.avatar}
                       alt={`${user.name}'s avatar`}
@@ -574,8 +758,6 @@ const fetchUsers = async (lang) => {
                         boxShadow: "0 0 8px rgba(0,0,0,0.3)",
                       }}
                     />
-
-                    {/* 👤 User Name */}
                     <span
                       style={{
                         fontSize: "1rem",
@@ -588,204 +770,213 @@ const fetchUsers = async (lang) => {
                       {user.name}
                     </span>
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-
-        case 'tones':
-          return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-              <div style={mobileHeaderStyle}>
-                <button onClick={goBack} style={backButtonStyle}>
-                  ← Back
-                </button>
-                <h2 style={panelTitleStyle}>{todoInfo.user?.name}'s Tones</h2>
-                <div style={{ width: "36px" }}></div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
-                {tones.map((tone) => (
-                  <div
-                    key={tone}
-                    style={glassCardStyle}
-                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, hoverGlassStyle)}
-                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, glassCardStyle)}
-                    onClick={() => handleSelectTone(tone)}
-                  >
-                    {tone}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-
-        case 'final':
-          return (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-              <div style={mobileHeaderStyle}>
-                <button onClick={goBack} style={backButtonStyle}>
-                  ← Back
-                </button>
-                <h2 style={panelTitleStyle}></h2>
-                <button style={closeButtonStyle} onClick={closePanel}>×</button>
-              </div>
-              {isLoading ? (
-                <div style={loaderStyle}>
-                  <LoadingSpinner />
-                  <p>Loading tasks...</p>
-                </div>
-              ) : toshow ? (
-                <>
-                  {toshow.tasks && toshow.tasks.length > 0 ? (
-                    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: "40px" }}>
-                      {toshow.tasks.map((task, index) => (
-                        <div key={index} style={taskCardStyle} onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)")} onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)")}>
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                            {task.user_info?.avatar && (
-                              <img
-                                src={task.user_info.avatar}
-                                alt={task.user_info.name}
-                                style={{ width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}
-                              />
-                            )}
-                            <div style={{ flex: 1 }}>
-                              <h3 style={{ color: "#333", marginBottom: "6px", fontSize: "1.1rem", fontWeight: "600" }}>{task.title}</h3>
-                              <p style={{ color: "#666", marginBottom: "8px", lineHeight: "1.4", fontSize: "0.95rem" }}>{task.description}</p>
-                              {task.user_info && (
-                                <p style={{ color: "#888", marginBottom: "6px", fontStyle: "italic", fontSize: "0.9rem" }}>
-                                  Assigned to: {task.user_info.name}
-                                </p>
-                              )}
-                              <p style={{ color: "#888", fontStyle: "italic", fontSize: "0.9rem" }}>
-                                Status: <span style={{ color: "#3b82f6", fontWeight: "500" }}>{task.status || "Pending"}</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={emptyStateStyle}>
-                      <SadFaceIcon />
-                      <h3 style={{ color: "#666", margin: "12px 0", fontSize: "1.2rem", fontWeight: "500" }}>No Todos Exist</h3>
-                      <p style={{ color: "#888", fontSize: "1rem", lineHeight: "1.4" }}>
-                        There are no tasks available for the selected language, user, and tone. Try adjusting your selections to fetch some todos.
-                      </p>
-                    </div>
-                  )}
-                  {toshow.aiResponse && (
-                    <div style={aiResponseStyle}>
-                      <strong style={{ color: "#3b82f6", fontSize: "0.95rem" }}>AI Suggestions:</strong>
-                      <div style={{ marginTop: "8px", fontSize: "0.9rem", lineHeight: "1.4" }}>{toshow.aiResponse}</div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div style={emptyStateStyle}>
-                  <p style={{ color: "#888", fontSize: "1.1rem" }}>404 Internal Server error!. Please try again.</p>
-                </div>
+                ))
               )}
             </div>
-          );
-
-        default:
-          return null;
-      }
-    };
-
-    return (
-      <div style={mainBackground}>
-        {/* Navbar */}
-        <div style={navbarStyle}>
-          <div style={{
-            fontWeight: "bold",
-            fontSize: isMobile ? "1.2rem" : "1.4rem",
-            color: "#333",
-            minWidth: isMobile ? "120px" : "auto"
-          }}>
-            CodexAde
           </div>
-          <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-            <input
-              type="text"
-              placeholder="Search..."
-              style={searchInputStyle}
-              onFocus={(e) => {
-                e.target.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.2)";
-                e.target.style.background = "rgba(255, 255, 255, 1)";
-                e.target.style.transform = "scale(1.02)";
-              }}
-              onBlur={(e) => {
-                e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-                e.target.style.background = "rgba(255, 255, 255, 0.9)";
-                e.target.style.transform = "scale(1)";
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <BellIcon />
-            <GearIcon />
-            <PersonIcon />
-          </div>
-        </div>
+        );
 
-        {/* Desktop Layout */}
-        {!isMobile ? (
-          <div style={{ display: "flex", flex: 1, minHeight: "calc(100vh - 70px)" }}>
-            {/* Language Bar */}
-            <div
-              style={{
-                width: "7vw",
-                minWidth: "80px",
-                background: "rgba(255, 255, 255, 0.7)",
-                backdropFilter: "blur(20px)",
-                padding: "32px 16px",
-                borderRight: "1px solid rgba(0, 0, 0, 0.05)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                boxShadow: "4px 0 20px rgba(0, 0, 0, 0.05)",
-              }}
-            >
-              {languages.map((lang) => (
+      case 'tones':
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <div style={mobileHeaderStyle}>
+              <button onClick={goBack} style={backButtonStyle}>
+                ← Back
+              </button>
+              <h2 style={panelTitleStyle}>{todoInfo.user?.name}'s Tones</h2>
+              <div style={{ width: "36px" }}></div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%" }}>
+              {tones.map((tone) => (
                 <div
-                  key={lang}
-                  style={{
-                    marginBottom: "32px",
-                    cursor: "pointer",
-                    fontWeight: todoInfo.language === lang ? "bold" : "500",
-                    color: todoInfo.language === lang ? "#3b82f6" : "#666",
-                    fontSize: "1rem",
-                    transition: "all 0.3s ease",
-                    userSelect: "none",
-                  }}
-                  onClick={() => handleSelectLanguage(lang)}
+                  key={tone}
+                  style={glassCardStyle}
+                  onMouseEnter={(e) => Object.assign(e.currentTarget.style, hoverGlassStyle)}
+                  onMouseLeave={(e) => Object.assign(e.currentTarget.style, glassCardStyle)}
+                  onClick={() => handleSelectTone(tone)}
                 >
-                  {lang}
+                  {tone}
                 </div>
               ))}
             </div>
+          </div>
+        );
 
-            {/* Welcome Panel */}
-            {!todoInfo.language && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", width: "93vw" }}>
-                <div style={{ textAlign: "center", margin: "0 auto", maxWidth: "600px" }}>
-                  <h1 style={{ marginBottom: "16px", color: "#333", fontSize: "2.5rem", fontWeight: "300" }}>Welcome to Codevern Dashboard</h1>
-                  <p style={{ color: "#666", fontSize: "1.2rem", marginBottom: "24px" }}>Select a language from the sidebar to get started with user tones and tasks.</p>
-                  <p style={{ color: "#888", fontSize: "1rem" }}>Manage multilingual todos with AI-generated responses tailored to user preferences.</p>
-                </div>
+      case 'final':
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <div style={mobileHeaderStyle}>
+              <button onClick={goBack} style={backButtonStyle}>
+                ← Back
+              </button>
+              <h2 style={panelTitleStyle}></h2>
+              <button style={closeButtonStyle} onClick={closePanel}>×</button>
+            </div>
+            {isLoading ? (
+              <div style={{ width: "100%", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                {renderTasksSkeleton()}
+              </div>
+            ) : toshow ? (
+              <>
+                {toshow.tasks && toshow.tasks.length > 0 ? (
+                  <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: "40px" }}>
+                    {toshow.tasks.map((task, index) => (
+                      <div key={index} style={taskCardStyle} onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)")} onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)")}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                          {task.user_info?.avatar && (
+                            <img
+                              src={task.user_info.avatar}
+                              alt={task.user_info.name}
+                              style={{ width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}
+                            />
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <h3 style={{ color: "#333", marginBottom: "6px", fontSize: "1.1rem", fontWeight: "600" }}>{task.title}</h3>
+                            <p style={{ color: "#666", marginBottom: "8px", lineHeight: "1.4", fontSize: "0.95rem" }}>{task.description}</p>
+                            {task.user_info && (
+                              <p style={{ color: "#888", marginBottom: "6px", fontStyle: "italic", fontSize: "0.9rem" }}>
+                                Assigned to: {task.user_info.name}
+                              </p>
+                            )}
+                            <p style={{ color: "#888", fontStyle: "italic", fontSize: "0.9rem" }}>
+                              Status: <span style={{ color: "#3b82f6", fontWeight: "500" }}>{task.status || "Pending"}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={emptyStateStyle}>
+                    <SadFaceIcon />
+                    <h3 style={{ color: "#666", margin: "12px 0", fontSize: "1.2rem", fontWeight: "500" }}>No Todos Exist</h3>
+                    <p style={{ color: "#888", fontSize: "1rem", lineHeight: "1.4" }}>
+                      There are no tasks available for the selected language, user, and tone. Try adjusting your selections to fetch some todos.
+                    </p>
+                  </div>
+                )}
+                {toshow.aiResponse && (
+                  <div style={aiResponseStyle}>
+                    <strong style={{ color: "#3b82f6", fontSize: "0.95rem" }}>AI Suggestions:</strong>
+                    <div style={{ marginTop: "8px", fontSize: "0.9rem", lineHeight: "1.4" }}>{toshow.aiResponse}</div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={emptyStateStyle}>
+                <p style={{ color: "#888", fontSize: "1.1rem" }}>404 Internal Server error!. Please try again.</p>
               </div>
             )}
+          </div>
+        );
 
-            {/* Users Panel */}
-            <div style={panelStyle(!!todoInfo.language, "18vw")}>
-              {todoInfo.language && (
-                <>
-                  <h3 style={{ marginBottom: "24px", color: "#333", fontSize: "1.3rem", fontWeight: "500" }}>
-                    {todoInfo.language} Users
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    {users.map((user) => (
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div style={mainBackground}>
+      {/* Navbar */}
+      <div style={navbarStyle}>
+        <div style={{
+          fontWeight: "bold",
+          fontSize: isMobile ? "1.2rem" : "1.4rem",
+          color: "#333",
+          minWidth: isMobile ? "120px" : "auto"
+        }}>
+          CodexAde
+        </div>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          <input
+            type="text"
+            placeholder="Search..."
+            style={searchInputStyle}
+            onFocus={(e) => {
+              e.target.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.2)";
+              e.target.style.background = "rgba(255, 255, 255, 1)";
+              e.target.style.transform = "scale(1.02)";
+            }}
+            onBlur={(e) => {
+              e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+              e.target.style.background = "rgba(255, 255, 255, 0.9)";
+              e.target.style.transform = "scale(1)";
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <BellIcon />
+          <GearIcon />
+          <PersonIcon />
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      {!isMobile ? (
+        <div style={{ display: "flex", flex: 1, minHeight: "calc(100vh - 70px)" }}>
+          {/* Language Bar */}
+          <div
+            style={{
+              width: "7vw",
+              minWidth: "80px",
+              background: "rgba(255, 255, 255, 0.7)",
+              backdropFilter: "blur(20px)",
+              padding: "32px 16px",
+              borderRight: "1px solid rgba(0, 0, 0, 0.05)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              boxShadow: "4px 0 20px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            {languages.map((lang) => (
+              <div
+                key={lang}
+                style={{
+                  marginBottom: "32px",
+                  cursor: "pointer",
+                  fontWeight: todoInfo.language === lang ? "bold" : "500",
+                  color: todoInfo.language === lang ? "#3b82f6" : "#666",
+                  fontSize: "1rem",
+                  transition: "all 0.3s ease",
+                  userSelect: "none",
+                }}
+                onClick={() => handleSelectLanguage(lang)}
+              >
+                {lang}
+              </div>
+            ))}
+          </div>
+
+          {/* Welcome Panel */}
+          {!todoInfo.language && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", width: "93vw" }}>
+              <div style={{ textAlign: "center", margin: "0 auto", maxWidth: "600px" }}>
+                <h1 style={{ marginBottom: "16px", color: "#333", fontSize: "2.5rem", fontWeight: "300" }}>Welcome to Codevern Dashboard</h1>
+                <p style={{ color: "#666", fontSize: "1.2rem", marginBottom: "24px" }}>Select a language from the sidebar to get started with user tones and tasks.</p>
+                <p style={{ color: "#888", fontSize: "1rem" }}>Manage multilingual todos with AI-generated responses tailored to user preferences.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Users Panel with Skeleton */}
+          <div style={panelStyle(!!todoInfo.language, "18vw")}>
+            {todoInfo.language && (
+              <>
+                <h3 style={{ marginBottom: "24px", color: "#333", fontSize: "1.3rem", fontWeight: "500" }}>
+                  {todoInfo.language} Users
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  {isLoadingUsers ? (
+                    <div style={{ width: "100%", padding: "0 16px" }}>
+                      {renderUsersSkeleton()}
+                    </div>
+                  ) : users.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px", color: "#666", width: "100%" }}>
+                      <p>No users found</p>
+                    </div>
+                  ) : (
+                    users.map((user) => (
                       <div
                         key={user.id}
                         style={{
@@ -802,7 +993,6 @@ const fetchUsers = async (lang) => {
                         onMouseLeave={(e) => Object.assign(e.currentTarget.style, glassCardStyle)}
                         onClick={() => handleSelectUser(user)}
                       >
-                        {/* 👇 Avatar Image */}
                         <img
                           src={user.avatar}
                           alt={`${user.name}'s avatar`}
@@ -815,8 +1005,6 @@ const fetchUsers = async (lang) => {
                             boxShadow: "0 0 10px rgba(0,0,0,0.3)",
                           }}
                         />
-
-                        {/* 👇 User Name */}
                         <span
                           style={{
                             fontSize: "1rem",
@@ -828,21 +1016,23 @@ const fetchUsers = async (lang) => {
                           {user.name}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+          </div>
 
-            {/* Tones Panel */}
-            <div style={panelStyle(!!todoInfo.user, "22vw")}>
-              {todoInfo.user && (
-                <>
-                  <h3 style={{ marginBottom: "24px", color: "#333", fontSize: "1.3rem", fontWeight: "500" }}>
-                    {todoInfo.user.name}'s Tones
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    {tones.map((tone) => (
+          {/* Tones Panel with Skeleton */}
+          <div style={panelStyle(!!todoInfo.user, "22vw")}>
+            {todoInfo.user && (
+              <>
+                <h3 style={{ marginBottom: "24px", color: "#333", fontSize: "1.3rem", fontWeight: "500" }}>
+                  {todoInfo.user.name}'s Tones
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  {tones.length > 0 ? (
+                    tones.map((tone) => (
                       <div
                         key={tone}
                         style={glassCardStyle}
@@ -852,107 +1042,144 @@ const fetchUsers = async (lang) => {
                       >
                         {tone}
                       </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Final Panel Desktop */}
-            <div style={{ ...panelStyle(!!todoInfo.style, "auto"), flex: 1, background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(20px)", padding: todoInfo.style ? "32px" : "0", height: "calc(100vh - 70px)" }}>
-              {todoInfo.style && (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "800px", margin: "0 auto" }}>
-                  {isLoading ? (
-                    <div style={loaderStyle}>
-                      <LoadingSpinner />
-                      <p>Loading tasks...</p>
-                    </div>
-                  ) : toshow ? (
-                    <>
-                      {toshow.tasks && toshow.tasks.length > 0 ? (
-                        <>
-                          <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            {toshow.tasks.map((task, index) => (
-                              <div key={index} style={taskCardStyle} onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)")} onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)")}>
-                                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                                  {task.user_info?.avatar && (
-                                    <img
-                                      src={task.user_info.avatar}
-                                      alt={task.user_info.name}
-                                      style={{ width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}
-                                    />
-                                  )}
-                                  <div style={{ flex: 1 }}>
-                                    <h3 style={{ color: "#333", marginBottom: "8px", fontSize: "1.3rem", fontWeight: "600" }}>{task.title}</h3>
-                                    <p style={{ color: "#666", marginBottom: "12px", lineHeight: "1.5" }}>{task.description}</p>
-                                    {task.user_info && (
-                                      <p style={{ color: "#888", marginBottom: "8px", fontStyle: "italic" }}>
-                                        Assigned to: {task.user_info.name}
-                                      </p>
-                                    )}
-                                    <p style={{ color: "#888", fontStyle: "italic" }}>
-                                      Status: <span style={{ color: "#3b82f6", fontWeight: "500" }}>{task.status || "Pending"}</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
-                        <div style={emptyStateStyle}>
-                          <SadFaceIcon />
-                          <h3 style={{ color: "#666", margin: "16px 0", fontSize: "1.5rem", fontWeight: "500" }}>No Todos Exist</h3>
-                          <p style={{ color: "#888", fontSize: "1.1rem", lineHeight: "1.5" }}>
-                            There are no tasks available for the selected language, user, and tone. Try adjusting your selections to fetch some todos.
-                          </p>
-                        </div>
-                      )}
-                      {toshow.aiResponse && (
-                        <div style={aiResponseStyle}>
-                          <strong style={{ color: "#3b82f6" }}>AI Suggestions to keepup with teh task:</strong> {toshow.aiResponse}
-                        </div>
-                      )}
-                    </>
+                    ))
                   ) : (
-                    <div style={emptyStateStyle}>
-                      <p style={{ color: "#888", fontSize: "1.1rem" }}>Failed to load tasks. Please try again.</p>
+                    <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                      Loading tones...
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          // Mobile Layout - Single Panel System
-          <>
-            {/* Show overlay when a panel is open (except welcome) */}
-            {(currentPanel !== 'welcome') && (
-              <div style={mobileOverlayStyle} onClick={goBack}>
-                <div style={mobilePanelStyle} onClick={(e) => e.stopPropagation()}>
-                  {renderMobilePanel()}
-                </div>
-              </div>
+              </>
             )}
+          </div>
 
-            {/* Welcome screen - no overlay */}
-            {currentPanel === 'welcome' && (
-              <div style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "calc(100vh - 70px)",
-                padding: "20px",
-                width: "100vw"
-              }}>
+          {/* Final Panel Desktop with Enhanced Skeleton */}
+<div style={{ ...panelStyle(!!todoInfo.style, "auto"), flex: 1, background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(20px)", padding: todoInfo.style ? "32px" : "0", height: "calc(100vh - 70px)" }}>
+  {todoInfo.style && (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "800px", margin: "0 auto" }}>
+      {isLoading ? (
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "300px",
+          width: "100%",
+        }}>
+          {/* Spinner */}
+          <div style={{
+            width: "48px",
+            height: "48px",
+            border: "6px solid rgba(59, 130, 246, 0.1)",
+            borderTop: "6px solid #3b82f6",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            marginBottom: "24px",
+          }} />
+          <p style={{ color: "#3b82f6", fontWeight: "500", fontSize: "1.1rem" }}>Loading tasks...</p>
+          <style>
+            {`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}
+          </style>
+        </div>
+      ) : toshow ? (
+        <>
+          {toshow.tasks && toshow.tasks.length > 0 ? (
+            <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              {toshow.tasks.map((task, index) => (
+                <div key={index} style={taskCardStyle} onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)")} onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.08)")}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
+                    {task.user_info?.avatar && (
+                      <img
+                        src={task.user_info.avatar}
+                        alt={task.user_info.name}
+                        style={{ width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}
+                      />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ color: "#333", marginBottom: "8px", fontSize: "1.3rem", fontWeight: "600" }}>{task.title}</h3>
+                      <p style={{ color: "#666", marginBottom: "12px", lineHeight: "1.5" }}>{task.description}</p>
+                      {task.user_info && (
+                        <p style={{ color: "#888", marginBottom: "8px", fontStyle: "italic" }}>
+                          Assigned to: {task.user_info.name}
+                        </p>
+                      )}
+                      <p style={{ color: "#888", fontStyle: "italic" }}>
+                        Status: <span style={{ color: "#3b82f6", fontWeight: "500" }}>{task.status || "Pending"}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={emptyStateStyle}>
+              <SadFaceIcon />
+              <h3 style={{ color: "#666", margin: "16px 0", fontSize: "1.5rem", fontWeight: "500" }}>No Todos Exist</h3>
+              <p style={{ color: "#888", fontSize: "1.1rem", lineHeight: "1.5" }}>
+                There are no tasks available for the selected language, user, and tone. Try adjusting your selections to fetch some todos.
+              </p>
+            </div>
+          )}
+          {toshow.aiResponse && (
+            <div style={aiResponseStyle}>
+              <strong style={{ color: "#3b82f6" }}>AI Suggestions to keepup with teh task:</strong> {toshow.aiResponse}
+            </div>
+          )}
+        </>
+      ) : (
+        <div style={emptyStateStyle}>
+          <p style={{ color: "#888", fontSize: "1.1rem" }}>Failed to load tasks. Please try again.</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+        </div>
+      ) : (
+        // Mobile Layout - Single Panel System
+        <>
+          {/* Show overlay when a panel is open (except welcome) */}
+          {(currentPanel !== 'welcome') && (
+            <div style={mobileOverlayStyle} onClick={goBack}>
+              <div style={mobilePanelStyle} onClick={(e) => e.stopPropagation()}>
                 {renderMobilePanel()}
               </div>
-            )}
-          </>
-        )}
+            </div>
+          )}
 
-        <style jsx>{`
+          {/* Welcome screen - no overlay */}
+          {currentPanel === 'welcome' && (
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "calc(100vh - 70px)",
+              padding: "20px",
+              width: "100vw"
+            }}>
+              {renderMobilePanel()}
+            </div>
+          )}
+        </>
+      )}
+
+      <style jsx>{`
+        @keyframes skeleton-loading {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+        
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
@@ -972,10 +1199,10 @@ const fetchUsers = async (lang) => {
         @media (max-width: 768px) {
           .mobile-optimized {
             padding: 8px;
-            font-size: 14px;
+            fontSize: 14px;
           }
         }
       `}</style>
-      </div>
-    );
-  }
+    </div>
+  );
+}
