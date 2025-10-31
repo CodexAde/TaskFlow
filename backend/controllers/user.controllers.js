@@ -22,10 +22,9 @@ async function Registering(req, res) {
         return res.status(400).json({ success: false, message: "Failed to create user" });
       }
       console.log("New user created:", newUser);
+      delete newUser.password; // Remove password before sending response
       res.status(201).json({
         success: true,
-        user: newUser,
-        avatar: avatar.url
       });
       return
     }

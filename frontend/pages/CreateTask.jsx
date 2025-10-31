@@ -4,11 +4,10 @@ import { useNavigate } from "react-router-dom";
 const CreateTask = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [task, setTask] = useState({
-    title: "To do",
-    description: "i have to do this task",
-    status: "Pending",
-    tone: "Angry", // new field
-    language: "English", // new field
+    title: "",
+    description: "",
+    status: "",
+    tone: "", // new field
   });
   const navigate = useNavigate();
 
