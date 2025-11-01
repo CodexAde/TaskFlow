@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import DashboardNavbar from "../components/dashboardComponent/icons/DashboardNavbar";
 
 export default function Dashboard() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -184,44 +185,6 @@ export default function Dashboard() {
     overflowX: "hidden"
   };
 
-  const navbarStyle = {
-    height: "70px",
-    background: "rgba(255, 255, 255, 0.95)",
-    backdropFilter: "blur(20px)",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-    color: "#333",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 16px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-    width: "100vw"
-  };
-
-  const searchInputStyle = {
-    width: isMobile ? "70%" : "50%",
-    maxWidth: isMobile ? "200px" : "400px",
-    padding: "8px 12px",
-    borderRadius: "20px",
-    border: "1px solid rgba(0, 0, 0, 0.1)",
-    outline: "none",
-    background: "rgba(255, 255, 255, 0.9)",
-    color: "#333",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-    transition: "all 0.3s ease",
-    fontSize: isMobile ? "14px" : "16px"
-  };
-
-  const iconStyle = {
-    cursor: "pointer",
-    color: "#666",
-    transition: "color 0.3s ease",
-    fontSize: isMobile ? "18px" : "20px",
-    padding: "4px"
-  };
 
   const glassCardStyle = {
     margin: "8px 0",
@@ -547,55 +510,6 @@ export default function Dashboard() {
     </div>
   );
 
-  // Icons (keeping all your existing icons)
-  const BellIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      fill="currentColor"
-      className="bi bi-bell"
-      viewBox="0 0 16 16"
-      style={iconStyle}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-    >
-      <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
-    </svg>
-  );
-
-  const GearIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      fill="currentColor"
-      className="bi bi-gear"
-      viewBox="0 0 16 16"
-      style={iconStyle}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-    >
-      <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
-      <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
-    </svg>
-  );
-
-  const PersonIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      fill="currentColor"
-      className="bi bi-person"
-      viewBox="0 0 16 16"
-      style={iconStyle}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "#3b82f6")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-    >
-      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
-    </svg>
-  );
 
   const SadFaceIcon = () => (
     <svg
@@ -878,38 +792,7 @@ export default function Dashboard() {
   return (
     <div style={mainBackground}>
       {/* Navbar */}
-      <div style={navbarStyle}>
-        <div style={{
-          fontWeight: "bold",
-          fontSize: isMobile ? "1.2rem" : "1.4rem",
-          color: "#333",
-          minWidth: isMobile ? "120px" : "auto"
-        }}>
-          CodexAde
-        </div>
-        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-          <input
-            type="text"
-            placeholder="Search..."
-            style={searchInputStyle}
-            onFocus={(e) => {
-              e.target.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.2)";
-              e.target.style.background = "rgba(255, 255, 255, 1)";
-              e.target.style.transform = "scale(1.02)";
-            }}
-            onBlur={(e) => {
-              e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-              e.target.style.background = "rgba(255, 255, 255, 0.9)";
-              e.target.style.transform = "scale(1)";
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <BellIcon />
-          <GearIcon />
-          <PersonIcon />
-        </div>
-      </div>
+<DashboardNavbar isMobile={isMobile}/>
 
       {/* Desktop Layout */}
       {!isMobile ? (
